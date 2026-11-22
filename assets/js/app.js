@@ -1,20 +1,268 @@
-// JavaScript handles interactions only. Page structure and text live in each HTML file.
-const STORAGE_KEY='creditmatch_simple_v3';
-const sourceCourses={CS101:{name:'การเขียนโปรแกรมเบื้องต้น',credit:3,cat:'major'},GE101:{name:'ภาษาอังกฤษเพื่อการสื่อสาร',credit:3,cat:'gened'},CS205:{name:'โครงสร้างข้อมูล',credit:3,cat:'major'},EL100:{name:'การพัฒนาทักษะชีวิต',credit:3,cat:'elective'}};
-const targetCourses={COM1101:{name:'หลักการเขียนโปรแกรม',credit:3,cat:'major'},GEN1002:{name:'ภาษาอังกฤษเพื่อการสื่อสาร',credit:3,cat:'gened'},COM2203:{name:'โครงสร้างข้อมูลและขั้นตอนวิธี',credit:3,cat:'major'},FRE1001:{name:'วิชาเลือกเสรี',credit:3,cat:'elective'}};
-const categoryLabels={major:'วิชาเฉพาะ',gened:'ศึกษาทั่วไป',elective:'เลือกเสรี'};
-const faculties={'คณะวิทยาศาสตร์และเทคโนโลยี':['วิทยาการคอมพิวเตอร์','เทคโนโลยีสารสนเทศ'],'คณะวิทยาการจัดการ':['บริหารธุรกิจ','การบัญชี'],'คณะครุศาสตร์':['การศึกษาปฐมวัย','คณิตศาสตร์'],'คณะมนุษยศาสตร์และสังคมศาสตร์':['ภาษาอังกฤษ','รัฐประศาสนศาสตร์']};
-let state={maps:[],submitted:false};try{const old=JSON.parse(localStorage.getItem(STORAGE_KEY));if(old&&Array.isArray(old.maps))state=old}catch(e){}
-function persist(){localStorage.setItem(STORAGE_KEY,JSON.stringify(state))}
-function credits(){return state.maps.reduce((sum,m)=>sum+(targetCourses[m.t]?.credit||0),0)}
-function notify(message){const t=document.getElementById('toast');if(!t)return;t.textContent=message;t.hidden=false;clearTimeout(window.toastTimer);window.toastTimer=setTimeout(()=>t.hidden=true,3000)}
-function initMenu(){const b=document.getElementById('menu-toggle'),n=document.getElementById('site-nav');b?.addEventListener('click',()=>{const open=n.classList.toggle('open');b.setAttribute('aria-expanded',String(open))})}
-function initHome(){document.getElementById('home-count').textContent=state.maps.length;document.getElementById('home-credits').textContent=credits();document.getElementById('home-status').textContent=state.submitted?'ส่งคำร้องแล้ว (จำลอง)':'ยังไม่ได้ส่งคำร้อง'}
-function initMapping(){const faculty=document.getElementById('faculty'),major=document.getElementById('major'),s=document.getElementById('source-course'),t=document.getElementById('target-course'),preview=document.getElementById('mapping-preview'),add=document.getElementById('add-mapping'),rows=document.getElementById('mapping-rows');
-faculty.addEventListener('change',()=>{major.replaceChildren(...faculties[faculty.value].map(name=>new Option(name,name)))});
-function updatePreview(){const a=sourceCourses[s.value],b=targetCourses[t.value];add.disabled=!(a&&b);if(!a||!b){preview.textContent='เลือกรายวิชาทั้งสองฝั่งเพื่อดูข้อมูลเปรียบเทียบ';return}preview.replaceChildren();const bold=document.createElement('strong');bold.textContent=a.name+' → '+b.name;preview.append(bold,document.createElement('br'),document.createTextNode(`หมวดวิชา: ${categoryLabels[b.cat]} • หน่วยกิต ${a.credit} → ${b.credit}`),document.createElement('br'),document.createTextNode(a.cat===b.cat?'หมวดวิชาตรงกัน แต่ยังต้องตรวจสอบเนื้อหาและเกณฑ์':'หมวดวิชาแตกต่างกัน ต้องให้เจ้าหน้าที่ตรวจสอบ'))}
-s.addEventListener('change',updatePreview);t.addEventListener('change',updatePreview);
-function renderRows(){rows.replaceChildren();if(!state.maps.length){const tr=rows.insertRow();const td=tr.insertCell();td.colSpan=4;td.className='empty';td.textContent='ยังไม่มีรายการจับคู่'}else state.maps.forEach((m,i)=>{const tr=rows.insertRow();[`${m.s} • ${sourceCourses[m.s]?.name||''}`,`${m.t} • ${targetCourses[m.t]?.name||''}`,categoryLabels[targetCourses[m.t]?.cat]||''].forEach(value=>tr.insertCell().textContent=value);const btn=document.createElement('button');btn.type='button';btn.className='remove-button';btn.textContent='ลบ';btn.addEventListener('click',()=>{state.maps.splice(i,1);state.submitted=false;persist();renderRows()});tr.insertCell().append(btn)});document.getElementById('mapping-total').textContent=credits()}
-add.addEventListener('click',()=>{if(!s.value||!t.value)return;if(state.maps.some(m=>m.s===s.value||m.t===t.value)){notify('รายวิชาต้นทางหรือปลายทางนี้ถูกเลือกแล้ว');return}state.maps.push({s:s.value,t:t.value});state.submitted=false;persist();renderRows();notify('เพิ่มรายการจับคู่แล้ว')});renderRows()}
-function initApplications(){const list=document.getElementById('application-list'),status=document.getElementById('application-status'),submit=document.getElementById('submit-application');function render(){list.replaceChildren();if(!state.maps.length){const p=document.createElement('p');p.className='empty';p.textContent='ยังไม่มีรายการ กรุณาจับคู่รายวิชาก่อน';list.append(p)}else state.maps.forEach(m=>{const item=document.createElement('div');item.className='application-item';const title=document.createElement('strong');title.textContent=`${sourceCourses[m.s]?.name||m.s} → ${targetCourses[m.t]?.name||m.t}`;const detail=document.createElement('small');detail.textContent=`${m.s} → ${m.t} • ${targetCourses[m.t]?.credit||0} หน่วยกิต • ${categoryLabels[targetCourses[m.t]?.cat]||''}`;item.append(title,detail);list.append(item)});document.getElementById('application-total').textContent=credits();status.textContent=state.submitted?'ส่งคำร้องแล้ว (จำลอง)':'ฉบับร่าง';submit.disabled=!state.maps.length||state.submitted}submit.addEventListener('click',()=>{state.submitted=true;persist();render();notify('ส่งคำร้องตัวอย่างเรียบร้อย')});render()}
-document.addEventListener('DOMContentLoaded',()=>{initMenu();const page=document.body.dataset.page;if(page==='0')initHome();if(page==='1')initMapping();if(page==='2')initApplications()});
+/**
+ * CreditMatch ARU — Frontend demonstration
+ * HTML owns page content; CSS owns appearance; this file owns behavior only.
+ * All course and curriculum data below are fictional examples.
+ */
+
+'use strict';
+
+const STORAGE_KEY = 'creditmatch_simple_v3';
+
+const SOURCE_COURSES = [
+  { code: 'CS101', name: 'การเขียนโปรแกรมเบื้องต้น', credits: 3, category: 'major' },
+  { code: 'GE101', name: 'ภาษาอังกฤษเพื่อการสื่อสาร', credits: 3, category: 'gened' },
+  { code: 'CS205', name: 'โครงสร้างข้อมูล', credits: 3, category: 'major' },
+  { code: 'EL100', name: 'การพัฒนาทักษะชีวิต', credits: 3, category: 'elective' },
+];
+
+const TARGET_COURSES = [
+  { code: 'COM1101', name: 'หลักการเขียนโปรแกรม', credits: 3, category: 'major' },
+  { code: 'GEN1002', name: 'ภาษาอังกฤษเพื่อการสื่อสาร', credits: 3, category: 'gened' },
+  { code: 'COM2203', name: 'โครงสร้างข้อมูลและขั้นตอนวิธี', credits: 3, category: 'major' },
+  { code: 'FRE1001', name: 'วิชาเลือกเสรี', credits: 3, category: 'elective' },
+];
+
+const FACULTY_MAJORS = {
+  'คณะวิทยาศาสตร์และเทคโนโลยี': ['วิทยาการคอมพิวเตอร์', 'เทคโนโลยีสารสนเทศ'],
+  'คณะวิทยาการจัดการ': ['บริหารธุรกิจ', 'การบัญชี'],
+  'คณะครุศาสตร์': ['การศึกษาปฐมวัย', 'คณิตศาสตร์'],
+  'คณะมนุษยศาสตร์และสังคมศาสตร์': ['ภาษาอังกฤษ', 'รัฐประศาสนศาสตร์'],
+};
+
+const CATEGORY_LABELS = {
+  gened: 'ศึกษาทั่วไป',
+  major: 'วิชาเฉพาะ',
+  elective: 'เลือกเสรี',
+};
+
+function getCourse(collection, code) {
+  return collection.find((course) => course.code === code);
+}
+
+function loadState() {
+  try {
+    const saved = JSON.parse(localStorage.getItem(STORAGE_KEY));
+    if (saved && Array.isArray(saved.mappings)) {
+      return { mappings: saved.mappings, submitted: Boolean(saved.submitted) };
+    }
+  } catch (error) {
+    console.warn('Unable to load saved demonstration data:', error);
+  }
+
+  return { mappings: [], submitted: false };
+}
+
+const state = loadState();
+
+function saveState() {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+  } catch (error) {
+    console.warn('Unable to save demonstration data:', error);
+    showToast('ไม่สามารถบันทึกข้อมูลในเบราว์เซอร์ได้');
+  }
+}
+
+function totalCredits() {
+  return state.mappings.reduce((sum, mapping) => {
+    const course = getCourse(TARGET_COURSES, mapping.target);
+    return sum + (course?.credits ?? 0);
+  }, 0);
+}
+
+function showToast(message) {
+  const toast = document.getElementById('toast');
+  if (!toast) return;
+
+  toast.textContent = message;
+  toast.hidden = false;
+  clearTimeout(showToast.timeoutId);
+  showToast.timeoutId = setTimeout(() => {
+    toast.hidden = true;
+  }, 3000);
+}
+
+function createElement(tag, className, text) {
+  const element = document.createElement(tag);
+  if (className) element.className = className;
+  if (text !== undefined) element.textContent = text;
+  return element;
+}
+
+// Shared top navigation (markup lives in each HTML page).
+function initializeNavigation() {
+  const toggle = document.getElementById('menu-toggle');
+  const navigation = document.getElementById('site-nav');
+  if (!toggle || !navigation) return;
+
+  toggle.addEventListener('click', () => {
+    const isOpen = navigation.classList.toggle('open');
+    toggle.setAttribute('aria-expanded', String(isOpen));
+  });
+}
+
+function initializeHome() {
+  document.getElementById('home-count').textContent = state.mappings.length;
+  document.getElementById('home-credits').textContent = totalCredits();
+  document.getElementById('home-status').textContent = state.submitted
+    ? 'ส่งคำร้องแล้ว (จำลอง)'
+    : 'ยังไม่ได้ส่งคำร้อง';
+}
+
+function initializeMapping() {
+  const faculty = document.getElementById('faculty');
+  const major = document.getElementById('major');
+  const sourceSelect = document.getElementById('source-course');
+  const targetSelect = document.getElementById('target-course');
+  const preview = document.getElementById('mapping-preview');
+  const addButton = document.getElementById('add-mapping');
+  const rows = document.getElementById('mapping-rows');
+  const total = document.getElementById('mapping-total');
+
+  function updateMajors() {
+    major.replaceChildren();
+    for (const name of FACULTY_MAJORS[faculty.value] ?? []) {
+      const option = createElement('option', '', name);
+      option.value = name;
+      major.append(option);
+    }
+  }
+
+  function updatePreview() {
+    const source = getCourse(SOURCE_COURSES, sourceSelect.value);
+    const target = getCourse(TARGET_COURSES, targetSelect.value);
+    preview.replaceChildren();
+    addButton.disabled = !(source && target);
+
+    if (!source || !target) {
+      preview.textContent = 'เลือกรายวิชาทั้งสองฝั่งเพื่อดูข้อมูลเปรียบเทียบ';
+      return;
+    }
+
+    preview.append(createElement('strong', '', `${source.name} → ${target.name}`));
+    preview.append(createElement(
+      'p',
+      'preview-note',
+      `หมวดวิชา: ${CATEGORY_LABELS[target.category]} • หน่วยกิต: ${source.credits} → ${target.credits}`,
+    ));
+    preview.append(createElement(
+      'p',
+      'hint',
+      source.category === target.category
+        ? 'หมวดวิชาตรงกัน แต่ยังต้องตรวจสอบคำอธิบายรายวิชาและเกณฑ์จริง'
+        : 'หมวดวิชาต่างกัน ต้องให้เจ้าหน้าที่ตรวจสอบ',
+    ));
+  }
+
+  function renderMappings() {
+    rows.replaceChildren();
+    total.textContent = totalCredits();
+
+    if (state.mappings.length === 0) {
+      const row = createElement('tr');
+      const cell = createElement('td', 'empty', 'ยังไม่มีรายการจับคู่');
+      cell.colSpan = 4;
+      row.append(cell);
+      rows.append(row);
+      return;
+    }
+
+    state.mappings.forEach((mapping, index) => {
+      const target = getCourse(TARGET_COURSES, mapping.target);
+      const row = createElement('tr');
+      row.append(createElement('td', '', mapping.source));
+      row.append(createElement('td', '', mapping.target));
+      row.append(createElement('td', '', CATEGORY_LABELS[target?.category] ?? '-'));
+
+      const actionCell = createElement('td');
+      const removeButton = createElement('button', 'remove-button', 'ลบ');
+      removeButton.type = 'button';
+      removeButton.addEventListener('click', () => {
+        state.mappings.splice(index, 1);
+        state.submitted = false;
+        saveState();
+        renderMappings();
+      });
+      actionCell.append(removeButton);
+      row.append(actionCell);
+      rows.append(row);
+    });
+  }
+
+  faculty.addEventListener('change', updateMajors);
+  sourceSelect.addEventListener('change', updatePreview);
+  targetSelect.addEventListener('change', updatePreview);
+
+  addButton.addEventListener('click', () => {
+    const source = sourceSelect.value;
+    const target = targetSelect.value;
+    if (!getCourse(SOURCE_COURSES, source) || !getCourse(TARGET_COURSES, target)) return;
+
+    if (state.mappings.some((mapping) => mapping.source === source && mapping.target === target)) {
+      showToast('รายการนี้ถูกเพิ่มแล้ว');
+      return;
+    }
+
+    state.mappings.push({ source, target });
+    state.submitted = false;
+    saveState();
+    renderMappings();
+    showToast('เพิ่มรายการจับคู่แล้ว');
+  });
+
+  updateMajors();
+  updatePreview();
+  renderMappings();
+}
+
+function initializeApplications() {
+  const list = document.getElementById('application-list');
+  const total = document.getElementById('application-total');
+  const status = document.getElementById('application-status');
+  const submitButton = document.getElementById('submit-application');
+
+  function renderApplication() {
+    list.replaceChildren();
+    total.textContent = totalCredits();
+    status.textContent = state.submitted ? 'ส่งคำร้องแล้ว (จำลอง)' : 'ฉบับร่าง';
+    submitButton.disabled = state.mappings.length === 0 || state.submitted;
+
+    if (state.mappings.length === 0) {
+      list.append(createElement('p', 'empty', 'ยังไม่มีรายการ กรุณาจับคู่รายวิชาก่อน'));
+      return;
+    }
+
+    for (const mapping of state.mappings) {
+      const source = getCourse(SOURCE_COURSES, mapping.source);
+      const target = getCourse(TARGET_COURSES, mapping.target);
+      const item = createElement('article', 'application-item');
+      item.append(createElement('strong', '', `${source?.name ?? mapping.source} → ${target?.name ?? mapping.target}`));
+      item.append(createElement(
+        'p',
+        'application-detail',
+        `${mapping.source} → ${mapping.target} • ${target?.credits ?? 0} หน่วยกิต • ${CATEGORY_LABELS[target?.category] ?? '-'}`,
+      ));
+      list.append(item);
+    }
+  }
+
+  submitButton.addEventListener('click', () => {
+    if (state.mappings.length === 0 || state.submitted) return;
+    state.submitted = true;
+    saveState();
+    renderApplication();
+    showToast('ส่งคำร้องตัวอย่างเรียบร้อย');
+  });
+
+  renderApplication();
+}
+
+// Each HTML page declares its own page ID; no HTML is injected to build a page.
+document.addEventListener('DOMContentLoaded', () => {
+  initializeNavigation();
+
+  const page = document.body.dataset.page;
+  if (page === '0') initializeHome();
+  if (page === '1') initializeMapping();
+  if (page === '2') initializeApplications();
+});
