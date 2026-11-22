@@ -1,1 +1,47 @@
-<!doctype html><html lang="th"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="theme-color" content="#153454"><title>CreditMatch | mapping | ARU</title><script src="https://cdn.tailwindcss.com"></script><link rel="stylesheet" href="../assets/css/style.css"><script defer src="https://unpkg.com/lucide@0.468.0/dist/umd/lucide.min.js"></script><script defer src="../assets/js/data.js"></script><script defer src="../assets/js/app.js"></script></head><body data-page="mapping"><div id="app"></div></body></html>
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>เทียบโอนรายวิชา | CreditMatch ARU</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="../assets/css/style.css">
+  <script src="../assets/js/app.js" defer></script>
+</head>
+<body data-page="1">
+  <header class="site-header">
+    <div class="header-inner">
+      <a class="brand" href="../index.html"><span class="brand-mark">C</span><span><strong>Credit<span class="gold">Match</span></strong><small>มหาวิทยาลัยราชภัฏพระนครศรีอยุธยา</small></span></a>
+      <button type="button" class="menu-toggle" id="menu-toggle" aria-label="เปิดเมนู" aria-expanded="false">☰</button>
+      <nav class="site-nav" id="site-nav" aria-label="เมนูหลัก"><a class="nav-link " href="../index.html">หน้าหลัก</a><a class="nav-link active" href="../pages/mapping.html">เทียบโอนรายวิชา</a><a class="nav-link " href="../pages/applications.html">คำร้องของฉัน</a><a class="nav-link " href="../pages/help.html">คู่มือ</a></nav>
+    </div>
+  </header>
+  <main class="main-container">
+    <div class="page-heading"><h1>เทียบโอนรายวิชา</h1><p>เลือกหลักสูตรและรายวิชาที่ต้องการจับคู่</p></div>
+    <section class="panel section">
+  <h2>1. เลือกหลักสูตรปลายทาง</h2>
+  <div class="form-grid">
+    <label>คณะ<select class="field" id="faculty"><option>คณะวิทยาศาสตร์และเทคโนโลยี</option><option>คณะวิทยาการจัดการ</option><option>คณะครุศาสตร์</option><option>คณะมนุษยศาสตร์และสังคมศาสตร์</option></select></label>
+    <label>สาขาวิชา<select class="field" id="major"><option>วิทยาการคอมพิวเตอร์</option><option>เทคโนโลยีสารสนเทศ</option></select></label>
+    <label>ปีหลักสูตร<select class="field" id="curriculum-year"><option>2568</option><option>2567</option><option>2566</option></select></label>
+  </div><p class="hint">ข้อมูลคณะ สาขาวิชา และหลักสูตรเป็นตัวอย่างสำหรับการสาธิต</p>
+</section>
+<section class="panel section">
+  <h2>2. จับคู่รายวิชา</h2>
+  <div class="form-grid two">
+    <label>รายวิชาที่เคยเรียน<select class="field" id="source-course"><option value="">-- เลือกรายวิชาต้นทาง --</option><option value="CS101">CS101 • การเขียนโปรแกรมเบื้องต้น (3 หน่วยกิต)</option><option value="GE101">GE101 • ภาษาอังกฤษเพื่อการสื่อสาร (3 หน่วยกิต)</option><option value="CS205">CS205 • โครงสร้างข้อมูล (3 หน่วยกิต)</option><option value="EL100">EL100 • การพัฒนาทักษะชีวิต (3 หน่วยกิต)</option></select></label>
+    <label>รายวิชาปลายทาง<select class="field" id="target-course"><option value="">-- เลือกรายวิชาปลายทาง --</option><option value="COM1101">COM1101 • หลักการเขียนโปรแกรม (3 หน่วยกิต)</option><option value="GEN1002">GEN1002 • ภาษาอังกฤษเพื่อการสื่อสาร (3 หน่วยกิต)</option><option value="COM2203">COM2203 • โครงสร้างข้อมูลและขั้นตอนวิธี (3 หน่วยกิต)</option><option value="FRE1001">FRE1001 • วิชาเลือกเสรี (3 หน่วยกิต)</option></select></label>
+  </div>
+  <div class="preview" id="mapping-preview">เลือกรายวิชาทั้งสองฝั่งเพื่อดูข้อมูลเปรียบเทียบ</div>
+  <button class="button button-primary" type="button" id="add-mapping" disabled>+ เพิ่มรายการจับคู่</button>
+</section>
+<section class="panel section">
+  <h2>3. รายการจับคู่ของฉัน</h2>
+  <div class="table-wrap"><table><thead><tr><th>รายวิชาต้นทาง</th><th>รายวิชาปลายทาง</th><th>หมวดวิชา</th><th>จัดการ</th></tr></thead><tbody id="mapping-rows"><tr><td colspan="4" class="empty">ยังไม่มีรายการจับคู่</td></tr></tbody></table></div>
+  <div class="section-actions"><p>รวม <strong id="mapping-total">0</strong> หน่วยกิตที่เสนอ</p><a class="button button-primary" href="applications.html">ตรวจสอบและส่งคำร้อง →</a></div>
+</section>
+  </main>
+  <footer class="site-footer">CreditMatch ARU • เว็บไซต์ต้นแบบเพื่อสาธิตการทำงาน ข้อมูลทั้งหมดเป็นตัวอย่าง</footer>
+  <div id="toast" role="status" aria-live="polite" class="toast" hidden></div>
+</body>
+</html>

@@ -1,1 +1,31 @@
-<!doctype html><html lang="th"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="theme-color" content="#153454"><title>CreditMatch | applications | ARU</title><script src="https://cdn.tailwindcss.com"></script><link rel="stylesheet" href="../assets/css/style.css"><script defer src="https://unpkg.com/lucide@0.468.0/dist/umd/lucide.min.js"></script><script defer src="../assets/js/data.js"></script><script defer src="../assets/js/app.js"></script></head><body data-page="applications"><div id="app"></div></body></html>
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>คำร้องของฉัน | CreditMatch ARU</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="../assets/css/style.css">
+  <script src="../assets/js/app.js" defer></script>
+</head>
+<body data-page="2">
+  <header class="site-header">
+    <div class="header-inner">
+      <a class="brand" href="../index.html"><span class="brand-mark">C</span><span><strong>Credit<span class="gold">Match</span></strong><small>มหาวิทยาลัยราชภัฏพระนครศรีอยุธยา</small></span></a>
+      <button type="button" class="menu-toggle" id="menu-toggle" aria-label="เปิดเมนู" aria-expanded="false">☰</button>
+      <nav class="site-nav" id="site-nav" aria-label="เมนูหลัก"><a class="nav-link " href="../index.html">หน้าหลัก</a><a class="nav-link " href="../pages/mapping.html">เทียบโอนรายวิชา</a><a class="nav-link active" href="../pages/applications.html">คำร้องของฉัน</a><a class="nav-link " href="../pages/help.html">คู่มือ</a></nav>
+    </div>
+  </header>
+  <main class="main-container">
+    <div class="page-heading"><h1>คำร้องของฉัน</h1><p>ตรวจสอบรายการจับคู่ก่อนส่งคำร้อง</p></div>
+    <section class="panel section">
+  <div class="section-heading"><h2>รายการที่ต้องการเทียบโอน</h2><span class="pill" id="application-status">ฉบับร่าง</span></div>
+  <div id="application-list" class="application-list"><p class="empty">ยังไม่มีรายการ กรุณาจับคู่รายวิชาก่อน</p></div>
+  <div class="section-actions"><p>รวม <strong id="application-total">0</strong> หน่วยกิตที่เสนอ</p><button class="button button-primary" type="button" id="submit-application" disabled>ส่งคำร้องเพื่อตรวจสอบ</button></div>
+  <p class="hint">การส่งคำร้องเป็นการจำลองภายในเบราว์เซอร์ ไม่ได้ส่งข้อมูลไปยังมหาวิทยาลัย</p>
+</section>
+  </main>
+  <footer class="site-footer">CreditMatch ARU • เว็บไซต์ต้นแบบเพื่อสาธิตการทำงาน ข้อมูลทั้งหมดเป็นตัวอย่าง</footer>
+  <div id="toast" role="status" aria-live="polite" class="toast" hidden></div>
+</body>
+</html>
