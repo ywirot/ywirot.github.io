@@ -3,43 +3,340 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>หน้าหลัก | CreditMatch ARU</title>
+  <title>ARU-CreditMatch</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="assets/css/style.css">
   <script src="assets/js/app.js" defer></script>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Sarabun', 'Inter', sans-serif;
+      background-color: #f1f5f9;
+      color: #1e293b;
+      padding: 24px 16px;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+
+    .page-header {
+      text-align: center;
+      margin-bottom: 28px;
+    }
+
+    /* =====================================================================
+       2. การจัดวางกลุ่ม Card แบบ 3 คอลัมน์ใน 1 แถว (จัดกลางและไม่เต็มจอ)
+       ===================================================================== */
+    .card-grid {
+      display: grid;
+      /* บังคับให้แบ่งเป็น 3 คอลัมน์เท่าๆ กันใน 1 แถว */
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 20px;
+      width: 100%;
+      max-width: 1100px;           /* จำกัดความกว้างไม่ให้เต็มจอ (ปรับค่านี้ให้เท่ากับ max-width ของ .steps) */
+      height: 200px;
+      margin: 0 auto 36px auto;    /* จัดให้อยู่ตรงกลางแนวนอน (ซ้าย-ขวา auto) */
+    }
+
+    /* ถ้าเปิดบนหน้าจอมือถือที่แคบมากๆ (น้อยกว่า 520px) ค่อยเรียงลงมาเป็น 1 แถว */
+    @media (max-width: 520px) {
+      .card-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* =====================================================================
+       3. คำสั่ง CSS หลักสำหรับการสร้าง CARD (หัวใจสำคัญ)
+       ===================================================================== */
+    .card {
+      background-color: #ffffff;           /* พื้นหลังสีขาว */
+      border: 1px solid #e2e8f0;           /* เส้นขอบบางๆ สีเทาอ่อน */
+      border-radius: 16px;                 /* ความโค้งมนของมุมการ์ด */
+      box-shadow: 0 4px 12px rgba(15, 23, 42, 0.06); /* เงาฟุ้งนุ่มนวล */
+      overflow: hidden;                    /* ตัดส่วนเกิน (เช่น รูปภาพ) ให้โค้งตามมุมการ์ด */
+      display: flex;                       /* ใช้ Flexbox จัดเรียงเนื้อหาแนวตั้ง */
+      flex-direction: column;
+      transition: transform 0.25s ease, box-shadow 0.25s ease; /* เอฟเฟกต์เคลื่อนไหวนุ่มนวล */
+    }
+
+    /* เอฟเฟกต์เมื่อนำเมาส์ไปชี้ที่การ์ด (Hover Effect) */
+    .card:hover {
+      transform: translateY(-5px);         /* ลอยขึ้นเล็กน้อย 5px */
+      box-shadow: 0 12px 24px rgba(15, 23, 42, 0.12); /* เงาเข้มและกว้างขึ้น */
+    }
+
+    /* ส่วนรูปภาพด้านบนของการ์ด */
+    .card-image {
+      width: 100%;
+      height: 50px;
+      object-fit: cover;                   /* ปรับสัดส่วนรูปให้เต็มกรอบโดยไม่บิดเบี้ยว */
+      display: block;
+      background-color: #e2e8f0;
+      
+    }
+
+    /* ส่วนเนื้อหาภายในของการ์ด */
+    .card-body {
+      padding: 20px;                       /* ระยะห่างขอบด้านใน */
+      flex-grow: 1;                        /* ดันส่วนท้าย (Footer) ลงไปชิดด้านล่างเสมอ */
+    }
+
+    /* ป้ายกำกับหมวดหมู่ (Badge) */
+    .card-badge {
+      display: inline-block;
+      padding: 4px 10px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      border-radius: 9999px;               /* ทรงแคปซูล */
+      background-color: #fef2f2;
+      color: #8b1e24;
+      margin-bottom: 10px;
+    }
+
+    .card-title {
+      font-size: 1.15rem;
+      font-weight: 600;
+      color: #0f172a;
+      margin-bottom: 8px;
+    }
+
+    .card-text {
+      font-size: 0.92rem;
+      color: #475569;
+      margin-bottom: 16px;
+    }
+
+    /* ส่วนท้ายของการ์ด (Footer) */
+    .card-footer {
+      padding: 14px 20px;
+      background-color: #f8fafc;
+      border-top: 1px solid #f1f5f9;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    /* ปุ่มกดภายในการ์ด */
+    .btn-card {
+      display: inline-block;
+      padding: 8px 16px;
+      background-color: #8b1e24;
+      color: #ffffff;
+      text-decoration: none;
+      font-family: 'Prompt', sans-serif;
+      font-size: 0.85rem;
+      font-weight: 500;
+      border-radius: 10px;
+      border: none;
+      cursor: pointer;
+      transition: background-color 0.2s ease;
+    }
+
+    .btn-card:hover {
+      background-color: #6b1419;
+    }
+
+    /* =====================================================================
+       4. ตัวอย่างเสริม: การ์ดแนวนอน (Horizontal Card)
+       ===================================================================== */
+    .card-horizontal {
+      flex-direction: row;                 /* จัดเรียงซ้าย-ขวาแทนบน-ล่าง */
+      align-items: center;
+      padding: 18px;
+      gap: 16px;
+      margin-bottom: 36px;
+    }
+
+    .card-avatar {
+      width: 64px;
+      height: 64px;
+      border-radius: 14px;
+      background: linear-gradient(135deg, #8b1e24, #c8961e);
+      color: #ffffff;
+      font-family: 'Prompt', sans-serif;
+      font-weight: 700;
+      font-size: 1.25rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    /* ปรับการ์ดแนวนอนให้เรียงแนวตั้งอัตโนมัติบนหน้าจอมือถือขนาดเล็ก */
+    @media (max-width: 540px) {
+      .card-horizontal {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+    }
+
+    /* =====================================================================
+       5. กล่องแสดงโค้ดตัวอย่างสำหรับคัดลอกไปใช้งาน
+       ===================================================================== */
+    .code-box {
+      background-color: #0f172a;
+      color: #e2e8f0;
+      border-radius: 16px;
+      padding: 20px;
+      overflow-x: auto;
+    }
+
+    .code-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid #334155;
+    }
+
+    .code-header span {
+      font-family: 'Prompt', sans-serif;
+      font-size: 0.9rem;
+      color: #fbbf24;
+    }
+
+    .btn-copy {
+      background-color: #334155;
+      color: #ffffff;
+      border: none;
+      padding: 6px 12px;
+      border-radius: 8px;
+      font-size: 0.8rem;
+      cursor: pointer;
+    }
+
+    .btn-copy:hover {
+      background-color: #475569;
+    }
+
+    pre {
+      font-family: 'Inter', monospace;
+      font-size: 0.85rem;
+      line-height: 1.5;
+      white-space: pre;
+    }
+
+    /* Toast แจ้งเตือนเมื่อคัดลอกโค้ด */
+    .toast {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background-color: #065f46;
+      color: #ffffff;
+      padding: 12px 18px;
+      border-radius: 12px;
+      font-size: 0.9rem;
+      box-shadow: 0 10px 20px rgba(0,0,0,0.15);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s ease;
+    }
+
+    .toast.show {
+      opacity: 1;
+    }
+  </style>
 </head>
 <body data-page="0">
   <header class="site-header">
     <div class="header-inner">
-      <a class="brand" href="index.html"><span class="brand-mark">C</span><span><strong>Credit<span class="gold">Match</span></strong><small>มหาวิทยาลัยราชภัฏพระนครศรีอยุธยา</small></span></a>
+      <a class="brand" href="index.html">
+        <span class="brand-mark">ARU</span><span><strong>Credit<span class="gold">Match</span></strong><small>มหาวิทยาลัยราชภัฏพระนครศรีอยุธยา</small></span>
+      </a>
       <button type="button" class="menu-toggle" id="menu-toggle" aria-label="เปิดเมนู" aria-expanded="false">☰</button>
-      <nav class="site-nav" id="site-nav" aria-label="เมนูหลัก"><a class="nav-link active" href="index.html">หน้าหลัก</a><a class="nav-link " href="pages/mapping.html">เทียบโอนรายวิชา</a><a class="nav-link " href="pages/applications.html">คำร้องของฉัน</a><a class="nav-link " href="pages/help.html">คู่มือ</a></nav>
+      <nav class="site-nav" id="site-nav" aria-label="เมนูหลัก">
+        <a class="nav-link active" href="index.html">หน้าหลัก</a>
+        <a class="nav-link " href="pages/mapping.html">เทียบโอนรายวิชา</a>
+        <a class="nav-link " href="pages/applications.html">คำร้องของฉัน</a>
+        <a class="nav-link " href="pages/help.html">คู่มือ</a>
+      </nav>
     </div>
   </header>
   <main class="main-container">
-    <div class="page-heading"><h1>หน้าหลัก</h1><p>เทียบโอนหน่วยกิตได้สะดวกใน 3 ขั้นตอน</p></div>
-    <section class="hero panel">
-  <div><span class="eyebrow">ระบบกลางเพื่อการเทียบโอนหน่วยกิต</span>
-  <h2>เริ่มเทียบโอนรายวิชาได้ง่าย ๆ</h2>
-  <p>เลือกหลักสูตร จับคู่รายวิชาที่เคยเรียน และตรวจสอบรายการก่อนส่งคำร้อง</p>
+    <div class="eyebrow"><h2>เทียบโอนหน่วยกิตได้สะดวกใน 3 ขั้นตอน</h2></div>
+  <section class="hero panel">
   <a class="button button-primary" href="pages/mapping.html">เริ่มเทียบโอนรายวิชา →</a></div>
-  <div class="stats"><div class="stat"><strong id="home-count">0</strong><span>รายวิชาที่จับคู่</span></div><div class="stat"><strong id="home-credits">0</strong><span>หน่วยกิตที่เสนอ</span></div><div class="stat wide"><span>สถานะคำร้อง</span><strong class="status-text" id="home-status">ยังไม่ได้ส่งคำร้อง</strong></div></div>
-</section>
-<section class="steps">
-  <article class="panel step"><b>01</b>
-    <h3>เลือกหลักสูตร</h3>
-    <p>ระบุคณะ สาขาวิชา และปีหลักสูตร</p>
-  </article>
-  <article class="panel step"><b>02</b>
-    <h3>จับคู่รายวิชา</h3><p>เลือกวิชาต้นทางและปลายทาง</p>
-  </article>
-  <article class="panel step"><b>03</b>
-    <h3>ส่งคำร้อง</h3><p>ตรวจสอบข้อมูลและส่งคำร้องตัวอย่าง</p>
-  </article>
-</section>
+  <div class="stats">
+    <div class="stat">
+      <strong id="home-count">0</strong><span>รายวิชาที่จับคู่</span>
+    </div>
+    <div class="stat"><strong id="home-credits">0</strong><span>หน่วยกิตที่เสนอ</span></div>
+  </div>
+  </section>
+
+
+
+
+<!-- กลุ่มการ์ดแบบ 3 คอลัมน์ -->
+    <section class="card-grid">
+      <!-- ตัวอย่างที่ 1: การ์ดพร้อมรูปภาพด้านบน -->
+      <article class="card">
+       <svg class="card-image" viewBox="0 0 100% 100%" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="01 เลือกหลักสูตร">
+          <rect width="600" height="360" fill="#8B1E24" />
+          <circle cx="530" cy="50" r="95" fill="#FFFFFF" fill-opacity="0.06" />
+          <circle cx="70" cy="320" r="110" fill="#C8961E" fill-opacity="0.16" />
+          <text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" fill="#FFFFFF" font-family="'Prompt', 'Sarabun', sans-serif" font-size="20" font-weight="600">
+            01 เลือกหลักสูตร
+          </text>
+        </svg>
+        <div class="card-body">
+          
+          <h2 class="card-title">ระบุคณะ สาขาวิชา และปีหลักสูตร</h2>
+          <p class="card-text" style="text-align: justify;">
+            <strong>ตัวอย่าง</strong> คณะวิทยาศาสตร์และเทคโนโลยี สาขาวิชาวิทยาการคอมพิวเตอร์ หลักสูตรปี 2568 
+          </p>
+        </div>
+      </article>
+
+      <!-- ตัวอย่างที่ 2: การ์ดข้อความพื้นฐาน -->
+      <article class="card">
+       <svg class="card-image" viewBox="0 0 100% 100%" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="01 เลือกหลักสูตร">
+          <rect width="600" height="360" fill="#8B1E24" />
+          <circle cx="530" cy="50" r="95" fill="#FFFFFF" fill-opacity="0.06" />
+          <circle cx="70" cy="320" r="110" fill="#C8961E" fill-opacity="0.16" />
+          <text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" fill="#FFFFFF" font-family="'Prompt', 'Sarabun', sans-serif" font-size="20" font-weight="600">
+            02 จับคู่รายวิชา
+          </text>
+        </svg>
+        <div class="card-body">
+          
+          <h2 class="card-title">ระบุคณะ สาขาวิชา และปีหลักสูตร</h2>
+          <p class="card-text" style="text-align: justify;">
+            <strong>ตัวอย่าง</strong> เลือกวิชาต้นทางและปลายทาง 
+          </p>
+        </div>
+      </article>
+
+      <!-- ตัวอย่างที่ 3: การ์ดสรุปข้อมูล / สถิติ -->
+      <article class="card">
+       <svg class="card-image" viewBox="0 0 100% 100%" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="01 เลือกหลักสูตร">
+          <rect width="600" height="360" fill="#8B1E24" />
+          <circle cx="530" cy="50" r="95" fill="#FFFFFF" fill-opacity="0.06" />
+          <circle cx="70" cy="320" r="110" fill="#C8961E" fill-opacity="0.16" />
+          <text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" fill="#FFFFFF" font-family="'Prompt', 'Sarabun', sans-serif" font-size="20" font-weight="600">
+            03 ส่งคำร้อง
+          </text>
+        </svg>
+        <div class="card-body">
+          
+          <h2 class="card-title">ระบุคณะ สาขาวิชา และปีหลักสูตร</h2>
+          <p class="card-text" style="text-align: justify;">
+            <strong>ตัวอย่าง</strong> ตรวจสอบข้อมูลและส่งคำร้อง
+          </p>
+        </div>
+      </article>
+    </section>
 </main>
 
-  <footer class="site-footer">CreditMatch ARU • เว็บไซต์ต้นแบบเพื่อสาธิตการทำงาน ข้อมูลทั้งหมดเป็นตัวอย่าง</footer>
-  <div id="toast" role="status" aria-live="polite" class="toast" hidden></div>
 </body>
 </html>
